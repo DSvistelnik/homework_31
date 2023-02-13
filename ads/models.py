@@ -1,16 +1,22 @@
 from django.db import models
 
 class Category(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name: models.CharField = models.CharField(max_length=200)
 
-class AD(models.Model):
-    name = models.CharField(max_length=200)
-    author_id = models.ForeignKey('users.User', on_delete=models.CASCADE)
-    price = models.PositiveIntegerField()
-    description = models.TextField()
-    address = models.CharField(max_length=300)
-    is_published = models.BooleanField()
-    category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='ads/', null=True, blank=True)
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
 
 
+class Advertisement(models.Model):
+    name: str = models.CharField(max_length=200)
+    author_id: str = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    price: int = models.PositiveIntegerField()
+    description: str = models.CharField(max_length=1000)
+    is_published: bool = models.BooleanField()
+    image = models.ImageField()
+    category_id = models.ForeignKey("ads.Category", on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "Объявление"
+        verbose_name_plural = "Объявления"

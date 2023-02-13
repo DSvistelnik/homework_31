@@ -1,31 +1,23 @@
 from django.db import models
 
-class Location(models.Model):
-    name = models.CharField(max_length=200)
-    lat = models.DecimalField(max_length=8, decimal_places=6, null=True)
-    lng = models.DecimalField(max_length=8, decimal_places=6, null=True)
 
-    class Meta:
-        verbose_name = 'Место'
-        verbose_name_plural = 'Места'
-
-    def __str__(self):
-        return self.name
-
-
+# Create your models here.
 class User(models.Model):
+    ROLE: list[tuple] = [
+        ("admin", "админ"),
+        ("moderator", "модератор"),
+        ("member", "участник"),
+    ]
+    first_name: str = models.CharField(max_length=50)
+    last_name: str = models.CharField(max_length=50)
+    username: str = models.CharField(max_length=50)
+    password: str = models.CharField(max_length=50)
+    role: str = models.CharField(max_length=50, choices=ROLE, default="member")
+    age: int = models.PositiveSmallIntegerField()
+    location_id: int = models.ForeignKey("users.Location", on_delete=models.CASCADE)
 
 
-    class Roles(models.TextChoices):
-        ADMIN = 'admin', 'Админ'
-        MODERATOR = 'moderator', 'Модератор'
-        MEMBER = 'member', 'Пользователь'
-
-
-    first_name = models.CharField(max_length=200)
-    last_name = models.CharField(max_length=200)
-    username = models.CharField(max_length=200)
-    password = models.CharField(max_length=200)
-    role = models.CharField(max_length=200)
-    age = models.PositiveIntegerField()
-    locations = models.ManyToManyField(Location)
+class Location(models.Model):
+    name: str = models.CharField(max_length=250)
+    lat: float = models.DecimalField(max_digits=10, decimal_places=6)
+    lng: float = models.DecimalField(max_digits=10, decimal_places=6)
