@@ -16,14 +16,12 @@ Including another URLconf
 from ads import views
 from django.contrib import admin
 from django.urls import path
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index),
-    path('cat/', views.CategoryListView.as_view(), name="category_list"),
-    path('cat/create/', views.CategoryCreateView.as_view(), name="category_list"),
-    # path('ad/', views.AdvertisementView.as_view()),
-    path('cat/<int:pk>/', views.CategoryDetailView.as_view(), name="category_detail"),
-    # path('ad/<int:pk>/', views.AdvertisementDetailView.as_view()),
+    path('', include("ads.urls")),
+    path('user/', include("users.urls")),
+
 ]
 

@@ -21,7 +21,7 @@ class CategoryListView(generic.ListView):
     def get(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
         super().get(request, *args, **kwargs)
 
-        categories: QuerySet[Category] = self.object_list
+        categories: QuerySet[Category] = self.object_list.order_by("name")
 
         response: list = []
         for category in categories:
