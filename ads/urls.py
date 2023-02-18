@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 from homework_27 import settings
 
+# шаблоны URL-адресов
 urlpatterns = [
     path('cat/', views.CategoryListView.as_view(), name="category_list"),
     path('cat/create/', views.CategoryCreateView.as_view(), name="category_create"),
