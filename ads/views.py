@@ -1,20 +1,22 @@
 import json
-from typing import Type
-from django.core.paginator import Paginator
+
+from rest_framework.viewsets import ModelViewSet
+
 from ads.models import Category, Advertisement
 from django.db.models import QuerySet
 from django.views import generic
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from homework_27 import settings
+
+from ads.serializers import AdSerializer
 
 
 def index(request):
     return JsonResponse({"status": "ok"}, status=200)
 
 
-# Создаем свои представления Категории
+# Create your views here.
 class CategoryListView(generic.ListView):
     model = Category
 
@@ -22,7 +24,6 @@ class CategoryListView(generic.ListView):
         super().get(request, *args, **kwargs)
 
         categories: QuerySet[Category] = self.object_list.order_by("name")
-
 
         response: list = []
         for category in categories:
@@ -46,7 +47,7 @@ class CategoryDetailView(generic.DetailView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-
+# Create your views here.
 class CategoryCreateView(generic.CreateView):
     model = Category
     fields = ["name"]
@@ -91,139 +92,30 @@ class CategoryDeleteView(generic.DeleteView):
 
         return JsonResponse({"status": "ok"}, status=200)
 
-# Создаем свои представления Объявлений
-class AdvertisementListView(generic.ListView):
-    model = Advertisement
 
-    def get(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
-        super().get(request, *args, **kwargs)
+class AdViewSet(ModelViewSet):
+    queryset = Advertisement.objects.all()
+    serializer_class = AdSerializer
 
-        self.object_list = self.object_list.select_related("author").order_by("-price")
-        paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGE)
-        page_number = request.GET.get("page", 1)
-        page_object = paginator.get_page(page_number)
+    def list(self, request, *args, **kwargs):
+        categories = request.GET.getlist("cat")
+        if categories:
+            self.queryset = self.queryset.filter(category__in=categories)
 
-        advertisements: list = []
-        for advertisement in page_object:
-            advertisements.append({
-                "id": advertisement.id,
-                "name": advertisement.name,
-                "author_id": advertisement.author_id,
-                "author": advertisement.author.first_name,
-                "price": advertisement.price,
-                "description": advertisement.description,
-                "is_published": advertisement.is_published,
-                "image": advertisement.image.url if advertisement.image else None,
-                "category_id": advertisement.category_id,
-            })
+        text = request.GET.get("text")
+        if text:
+            self.queryset = self.queryset.filter(name__icontains=text)
 
-        response = {
-            "items": advertisements,
-            "total": paginator.count,
-            "num_pages": paginator.num_pages
-        }
+        location = request.GET.get("location")
+        if location:
+            self.queryset = self.queryset.filter(author__locations__name__icontains=location)
 
-        return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
+        price_from = request.GET.get("price_from")
+        if price_from:
+            self.queryset = self.queryset.filter(price__gte=price_from)
 
+        price_to = request.GET.get("price_to")
+        if price_to:
+            self.queryset = self.queryset.filter(price__lte=price_to)
 
-class AdvertisementDetailView(generic.DetailView):
-    model: Type[Advertisement] = Advertisement
-
-    def get(self, request: HttpRequest, *args: list, **kwargs: dict) -> JsonResponse:
-        advertisement: Advertisement = self.get_object()
-
-        return JsonResponse({
-            "id": advertisement.id,
-            "name": advertisement.name,
-            "author_id": advertisement.author_id,
-            "price": advertisement.price,
-            "description": advertisement.description,
-            "is_published": advertisement.is_published,
-            "image": advertisement.image.url if advertisement.image else None,
-            "category_id": advertisement.category_id,
-        }, json_dumps_params={"ensure_ascii": False})
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class AdvertisementCreateView(generic.CreateView):
-    model = Advertisement
-    fields = ["name", "author", "price", "description", "is_published", "image", "category"]
-
-    def post(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
-        super().post(request, *args, **kwargs)
-
-        advertisement_data: dict = json.loads(request.body)
-        advertisement: Advertisement = Advertisement.objects.create(**advertisement_data)
-        return JsonResponse({
-            "id": advertisement.id,
-            "name": advertisement.name,
-            "author_id": advertisement.author_id,
-            "price": advertisement.price,
-            "description": advertisement.description,
-            "is_published": advertisement.is_published,
-            "image": advertisement.image.url if advertisement.image else None,
-            "category_id": advertisement.category_id,
-        }, json_dumps_params={"ensure_ascii": False})
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class AdvertisementUpdateView(generic.UpdateView):
-    model = Advertisement
-    fields = ["name", "author", "price", "description", "category"]
-
-    def patch(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
-
-        advertisement_data: dict = json.loads(request.body)
-        advertisement = self.get_object()
-        advertisement.name = advertisement_data["name"]
-        advertisement.author_id = advertisement_data["author_id"]
-        advertisement.price = advertisement_data["price"]
-        advertisement.description = advertisement_data["description"]
-        advertisement.category_id = advertisement_data["category_id"]
-
-        advertisement.save()
-        return JsonResponse({
-            "id": advertisement.id,
-            "name": advertisement.name,
-            "author_id": advertisement.author_id,
-            "author": advertisement.author.first_name,
-            "price": advertisement.price,
-            "description": advertisement.description,
-            "is_published": advertisement.is_published,
-            "image": advertisement.image.url if advertisement.image else None,
-            "category_id": advertisement.category_id,
-        }, json_dumps_params={"ensure_ascii": False})
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class AdvertisementImageUpdateView(generic.UpdateView):
-    model = Advertisement
-    fields = ["image"]
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.image = request.FILES["image"]
-        self.object.save()
-
-        return JsonResponse({
-            "id": self.object.id,
-            "name": self.object.name,
-            "author_id": self.object.author_id,
-            "author": self.object.author.first_name,
-            "price": self.object.price,
-            "description": self.object.description,
-            "is_published": self.object.is_published,
-            "image": self.object.image.url if self.object.image else None,
-            "category_id": self.object.category_id,
-        }, json_dumps_params={"ensure_ascii": False})
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class AdvertisementDeleteView(generic.DeleteView):
-    model = Advertisement
-    success_url = "/"
-    def delete(self, request, *args, **kwargs):
-        super().delete(request, *args, **kwargs)
-
-        return JsonResponse({"status": "ok"}, status=200)
+        return super().list(request, *args, **kwargs)
