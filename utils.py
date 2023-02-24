@@ -63,7 +63,10 @@ def user_to_json(csv_file, json_file):
         csv_reader = csv.DictReader(csv_file)
 
         for rows in csv_reader:
-            data_dict = {"model": "users.user", "pk": rows["id"], "fields": rows}
+            data_dict = {"model": "users.user", "fields": rows}
+            rows["locations"] = [int(rows["locations"])]
+            del rows["location_id"]
+            del rows["id"]
             data_list.append(data_dict)
     with open(json_file, "w", encoding="utf-8") as json_file:
         json_file.write(json.dumps(data_list, indent=4, ensure_ascii=False))
