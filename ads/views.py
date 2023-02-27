@@ -47,7 +47,7 @@ class CategoryDetailView(generic.DetailView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-
+# Create your views here.
 class CategoryCreateView(generic.CreateView):
     model = Category
     fields = ["name"]
