@@ -1,19 +1,16 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
 # Создается модель Пользователей
-class User(models.Model):
+class User(AbstractUser):
     ROLE: list[tuple] = [
         ("admin", "админ"),
         ("moderator", "модератор"),
         ("member", "участник"),
     ]
-    first_name: models.CharField = models.CharField(max_length=50)
-    last_name: models.CharField = models.CharField(max_length=50)
-    username: models.CharField = models.CharField(max_length=50)
-    password: models.CharField = models.CharField(max_length=50)
     role: models.CharField = models.CharField(max_length=50, choices=ROLE, default="member")
-    age: models.PositiveSmallIntegerField = models.PositiveSmallIntegerField()
+    age: models.PositiveSmallIntegerField = models.PositiveSmallIntegerField(null=True)
     locations: models.ManyToManyField = models.ManyToManyField("users.Location")
 
     class Meta:

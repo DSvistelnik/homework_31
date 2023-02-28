@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    #'rest_framework_simplejwt'
     'users',
     'ads',
 
@@ -125,6 +126,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+    #'DEFAULT_AUTHENTICATION_CLASSES': [
+        #'rest_framework_simplejwt.authentication.JWTAuthentication',
+    #]
+}
+
 STATIC_URL = 'static/'
 
 # Default primary key field type
@@ -132,9 +141,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-TOTAL_ON_PAGE = 2
+TOTAL_ON_PAGE = 10
 
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 5
-}
+AUTH_USER_MODEL = "users.User"

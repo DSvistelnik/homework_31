@@ -37,4 +37,3 @@ class UserDeleteView(DestroyAPIView):
 class LocationViewSet(ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
-
