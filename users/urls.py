@@ -1,13 +1,24 @@
-from users import views
-from django.urls import path
+from users.views import *
+from django.contrib import admin
+from django.urls import path, include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework import routers
+from users.views import LocationViewSet
 
+#location_router = routers.SimpleRouter()
+#location_router.register("location", LocationViewSet)
 
 urlpatterns = [
-    path('', views.UserListView.as_view(), name="user_list"),
-    path('<int:pk>/', views.UserDetailView.as_view(), name="user_detail"),
-    path('create/', views.UserCreateView.as_view(), name="user_create"),
-    path('<int:pk>/delete/', views.UserDeleteView.as_view(), name="user_delete"),
-    path('<int:pk>/update/', views.UserUpdateViews.as_view(), name="user_update"),
+    path('', UserListView.as_view()),
+    path('<int:pk>/', UserDetailView.as_view()),
+    path('create/', UserCreateView.as_view()),
+    path('<int:pk>/delete/', UserDeleteView.as_view()),
+    path('<int:pk>/update/', UserUpdateViews.as_view()),
+
+    path('token/', TokenObtainPairView.as_view()),
+    path('token/refresh/', TokenRefreshView.as_view()),
 
 
 ]
+
+#urlpatterns += location_router.urls

@@ -18,3 +18,4 @@ class IsAdOwnerOrStaff(BasePermission):
         if request.user.role in ["admin", "moderator"]:
             return True
         return False
+
