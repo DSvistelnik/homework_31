@@ -7,7 +7,6 @@ from users.models import User
 class Category(models.Model):
     name: models.CharField = models.CharField(max_length=200)
 
-    # Имя в единственном и множественном числе
     class Meta:
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
@@ -15,7 +14,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-# Создание модели "Объявления"
 
 class Advertisement(models.Model):
     name: models.CharField = models.CharField(max_length=200)
