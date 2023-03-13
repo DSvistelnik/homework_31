@@ -2,7 +2,7 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from users.models import User
 
-from validators import check_is_published
+from ads.validators import check_is_published
 
 # Создание модели Категория
 
