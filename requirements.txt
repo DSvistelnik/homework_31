@@ -3,3 +3,6 @@ djangorestframework
 djangorestframework-simplejwt
 psycopg2-binary
 Pillow
+python-dateutil
+pytest-django
+pytest-factoryboy
