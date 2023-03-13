@@ -8,5 +8,5 @@ def access_token(client, django_user_model):
     password = "test"
     django_user_model.objects.create_user(username=username, password=password, birth_date="2000-01-01", role="admin")
 
-    response = client.post("/token/", {"username": username, "password": password})
+    response = client.post("/user/token/", {"username": username, "password": password})
     return response.data.get("access")
