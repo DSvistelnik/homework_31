@@ -1,10 +1,14 @@
 from rest_framework import serializers
-from rest_framework.fields import SerializerMethodField, BooleanField
+from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 
-from ads.validators import not_true
-from users.models import User
 from ads.models import Advertisement, Category, Selection
+from users.models import User
+
+class CategorySerializer(ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
 
 class AdSerializer(ModelSerializer):
     author = serializers.SlugRelatedField(
@@ -13,14 +17,13 @@ class AdSerializer(ModelSerializer):
     )
     category = serializers.SlugRelatedField(queryset=Category.objects.all(), slug_field="name")
     locations = SerializerMethodField()
-    is_published = BooleanField(validators=[not_true], required=False)
 
     def get_locations(self, ad):
         return [location.name for location in ad.author.locations.all()]
 
     class Meta:
         model = Advertisement
-        fields = "__all__"
+        exclude = ["image"]
 
 
 class AdDetailSerializer(ModelSerializer):
@@ -32,7 +35,7 @@ class AdDetailSerializer(ModelSerializer):
 
     class Meta:
         model = Advertisement
-        fields = "__all__"
+        exclude = ["image"]
 
 
 class SelectionListSerializer(serializers.ModelSerializer):

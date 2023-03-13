@@ -2,6 +2,7 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from users.models import User
 
+from validators import check_is_published
 
 # Создание модели Категория
 
@@ -22,7 +23,7 @@ class Advertisement(models.Model):
     author: models.ForeignKey = models.ForeignKey(User, on_delete=models.CASCADE)
     price: models.PositiveIntegerField = models.PositiveIntegerField()
     description: models.TextField = models.TextField(null=True, blank=True)
-    is_published: models.BooleanField = models.BooleanField(default=False)
+    is_published: models.BooleanField = models.BooleanField(validators=[check_is_published])
     image: models.ImageField = models.ImageField(upload_to="images/")
     category: models.ForeignKey = models.ForeignKey(Category, on_delete=models.CASCADE)
 

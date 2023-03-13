@@ -1,6 +1,7 @@
-from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError
 
-def not_true(value):
+
+def check_is_published(value):
     if value:
-        raise ValidationError("Нельзя создавать опубликованные объявления!")
+        raise ValidationError("Field can`t be True")
 
